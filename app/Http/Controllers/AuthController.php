@@ -23,15 +23,19 @@ class AuthController extends Controller
     {
         return view('auth.login');
     }
+    public function indexPassword()
+    {
+        return view('auth.login-password');
+    }
     public function register()
     {
         return view('auth.register');
     }
-    public function chooseVerify()
+    public function verifyEmail()
     {
         $session = new Session();
         $guid = $session->get('guid');
-        return view('auth.choose-verify', compact('guid'));
+        return view('verify-email', compact('guid'));
     }
     public function verify()
     {

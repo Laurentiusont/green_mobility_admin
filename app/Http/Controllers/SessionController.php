@@ -14,6 +14,7 @@ class SessionController extends Controller
         $session->set('access_token', $request->access_token);
         $session->set('name', $request->name);
         $session->set('guid', $request->guid);
+        $session->set('phone_number', $request->phone_number);
 
         return $request->name;
     }

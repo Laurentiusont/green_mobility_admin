@@ -20,8 +20,9 @@ Route::group([
     'middleware' => 'auth.guest',
 ], function ($router) {
     Route::get('/login', [AuthController::class, 'index'])->name('login');
+    Route::get('/login-password', [AuthController::class, 'indexPassword'])->name('login.password');
     Route::get('/register', [AuthController::class, 'register'])->name('register');
-    Route::get('/choose-verify', [AuthController::class, 'chooseVerify'])->name('choose-verify');
+    Route::get('/verify', [AuthController::class, 'verifyEmail'])->name('verify');
     Route::get('password/reset/email', [App\Http\Controllers\PasswordController::class, 'emailOTP'])->name('password.request');
     Route::get('password/reset/password', [App\Http\Controllers\PasswordController::class, 'inputReset'])->name('password.update');
 });
@@ -50,5 +51,3 @@ Route::get('auth/google/call-back/verify', [GoogleController::class, 'handleCall
 Route::get('auth/otp/verify', [AuthController::class, 'verify'])->name('otp-verification');
 Route::get('auth/otp/resend', [AuthController::class, 'resendOtp'])->name('otp-resend');
 Route::get('verify/{guid}/{otp}', [AuthController::class, 'checkOtp'])->name('check-otp');
-
-

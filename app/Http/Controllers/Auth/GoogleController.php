@@ -28,11 +28,11 @@ class GoogleController extends Controller
         return Socialite::driver('google')->redirect();
     }
 
-    public function syncToGoogle()
-    {
-        config(['services.google.redirect' => 'http://127.0.0.1:8000/auth/google/call-back/sync']);
-        return Socialite::driver('google')->redirect();
-    }
+    // public function syncToGoogle()
+    // {
+    //     config(['services.google.redirect' => 'http://127.0.0.1:8000/auth/google/call-back/sync']);
+    //     return Socialite::driver('google')->redirect();
+    // }
 
     public function verifyToGoogle()
     {
@@ -82,37 +82,37 @@ class GoogleController extends Controller
         }
     }
 
-    public function handleCallbackSync()
-    {
-        try {
-            config(['services.google.redirect' => 'http://127.0.0.1:8000/auth/google/call-back/sync']);
+    // public function handleCallbackSync()
+    // {
+    //     try {
+    //         config(['services.google.redirect' => 'http://127.0.0.1:8000/auth/google/call-back/sync']);
 
-            $user = Socialite::driver('google')->user();
-            $session = new Session();
-            $token = $session->get('access_token');
-            $response = Http::withHeaders([
-                'Authorization' => "Bearer " . $token,
-                'Content-Type' => "application/json"
-            ])->post(env("URL_API", "http://example.com") . '/api/v1/user/sync-google', [
-                'google_id' => $user->id,
-                'name' => $user->name,
-                'email' => $user->email
+    //         $user = Socialite::driver('google')->user();
+    //         $session = new Session();
+    //         $token = $session->get('access_token');
+    //         $response = Http::withHeaders([
+    //             'Authorization' => "Bearer " . $token,
+    //             'Content-Type' => "application/json"
+    //         ])->post(env("URL_API", "http://example.com") . '/api/v1/user/sync-google', [
+    //             'google_id' => $user->id,
+    //             'name' => $user->name,
+    //             'email' => $user->email
 
-            ]);
+    //         ]);
 
-            if ($response->successful()) {
-                $session->set('name', $response['data']['name']);
+    //         if ($response->successful()) {
+    //             $session->set('name', $response['data']['name']);
 
-                return redirect()->route('user-profile');
-            } else {
-                $errorData = $response->json();
-                $errorMessage = isset($errorData['message']) ? $errorData['message'] : 'Unknown error';
-                dd($response);
-            }
-        } catch (Exception $e) {
-            dd($e->getMessage());
-        }
-    }
+    //             return redirect()->route('user-profile');
+    //         } else {
+    //             $errorData = $response->json();
+    //             $errorMessage = isset($errorData['message']) ? $errorData['message'] : 'Unknown error';
+    //             dd($response);
+    //         }
+    //     } catch (Exception $e) {
+    //         dd($e->getMessage());
+    //     }
+    // }
 
     public function handleCallbackVerify()
     {
@@ -120,15 +120,15 @@ class GoogleController extends Controller
             config(['services.google.redirect' => 'http://127.0.0.1:8000/auth/google/call-back/verify']);
 
             $user = Socialite::driver('google')->user();
-            $session = new Session();
-            $guid = $session->get('guid');
+            // $session = new Session();
+            // $guid = $session->get('guid');
             $response = Http::withHeaders([
                 'Content-Type' => "application/json"
             ])->post(env("URL_API", "http://example.com") . '/api/v1/auth/verify-google', [
                 'google_id' => $user->id,
                 'name' => $user->name,
                 'email' => $user->email,
-                'guid' => $guid
+                // 'guid' => $guid
 
             ]);
 
