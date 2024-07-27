@@ -28,18 +28,6 @@ class GoogleController extends Controller
         return Socialite::driver('google')->redirect();
     }
 
-    // public function syncToGoogle()
-    // {
-    //     config(['services.google.redirect' => 'http://127.0.0.1:8000/auth/google/call-back/sync']);
-    //     return Socialite::driver('google')->redirect();
-    // }
-
-    public function verifyToGoogle()
-    {
-        config(['services.google.redirect' => 'http://127.0.0.1:8000/auth/google/call-back/verify']);
-        return Socialite::driver('google')->redirect();
-    }
-
 
     //tambahkan script di bawah ini 
     public function handleCallback()
@@ -50,7 +38,7 @@ class GoogleController extends Controller
             // dd($user->id);
             $response = Http::withHeaders([
                 'Content-Type' => "application/json"
-            ])->post(env("URL_API", "http://example.com") . '/api/v1/auth/login-google', [
+            ])->post(env("URL_API", "http://example.com") . '/api/v1/auth/verify-google', [
                 'google_id' => $user->id,
                 'name' => $user->name,
                 'email' => $user->email
@@ -71,69 +59,6 @@ class GoogleController extends Controller
                 } else {
                     dd("error");
                 }
-            } else {
-                // Tampilkan pesan error ke konsol jika tidak berhasil
-                $errorData = $response->json(); // Mendapatkan data error dalam bentuk array atau objek JSON
-                $errorMessage = isset($errorData['message']) ? $errorData['message'] : 'Unknown error';
-                dd($response);
-            }
-        } catch (Exception $e) {
-            dd($e->getMessage());
-        }
-    }
-
-    // public function handleCallbackSync()
-    // {
-    //     try {
-    //         config(['services.google.redirect' => 'http://127.0.0.1:8000/auth/google/call-back/sync']);
-
-    //         $user = Socialite::driver('google')->user();
-    //         $session = new Session();
-    //         $token = $session->get('access_token');
-    //         $response = Http::withHeaders([
-    //             'Authorization' => "Bearer " . $token,
-    //             'Content-Type' => "application/json"
-    //         ])->post(env("URL_API", "http://example.com") . '/api/v1/user/sync-google', [
-    //             'google_id' => $user->id,
-    //             'name' => $user->name,
-    //             'email' => $user->email
-
-    //         ]);
-
-    //         if ($response->successful()) {
-    //             $session->set('name', $response['data']['name']);
-
-    //             return redirect()->route('user-profile');
-    //         } else {
-    //             $errorData = $response->json();
-    //             $errorMessage = isset($errorData['message']) ? $errorData['message'] : 'Unknown error';
-    //             dd($response);
-    //         }
-    //     } catch (Exception $e) {
-    //         dd($e->getMessage());
-    //     }
-    // }
-
-    public function handleCallbackVerify()
-    {
-        try {
-            config(['services.google.redirect' => 'http://127.0.0.1:8000/auth/google/call-back/verify']);
-
-            $user = Socialite::driver('google')->user();
-            // $session = new Session();
-            // $guid = $session->get('guid');
-            $response = Http::withHeaders([
-                'Content-Type' => "application/json"
-            ])->post(env("URL_API", "http://example.com") . '/api/v1/auth/verify-google', [
-                'google_id' => $user->id,
-                'name' => $user->name,
-                'email' => $user->email,
-                // 'guid' => $guid
-
-            ]);
-
-            if ($response->successful()) {
-                return redirect()->route('login');
             } else {
                 $errorData = $response->json();
                 $errorMessage = isset($errorData['message']) ? $errorData['message'] : 'Unknown error';

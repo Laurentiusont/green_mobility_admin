@@ -18,9 +18,10 @@
                                 <div class="input-group-append">
                                     <span class="input-group-text"><i class="fa fa-envelope"></i></span>
                                 </div>
-                                <label class="form-label fw-500 d-none" id="error-message-login"
-                                    style="color: #EE3C3B;"></label>
+
                             </div>
+                            <label class="form-label fw-500 d-none" id="error-message-login"
+                                style="color: #EE3C3B;"></label>
 
                             <div class="row">
                                 <div class="col-12">
@@ -53,9 +54,9 @@
                     data: formData,
                     success: function(response) {
                         if (response.data === true) {
-                            window.location = "/login-password";
-                        } else {
                             window.location = "{{ route('google-auth') }}";
+                        } else {
+                            window.location = "/login-password";
                         }
                     },
                     error: function(xhr, status, error) {

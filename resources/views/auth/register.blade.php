@@ -41,74 +41,74 @@
                                     </span>
                                 @enderror
                             </div>
-
-                            <div class="input-group mb-3">
-                                <input type="text" name="phone_number" id="phone_number"
-                                    class="form-control @error('phone_number') is-invalid @enderror"
-                                    placeholder="{{ __('Phone Number') }}" required autocomplete="phone_number">
-                                <div class="input-group-append">
-                                    <div class="input-group-text">
-                                        <span class="fas fa-phone"></span>
-                                    </div>
-                                </div>
-                                @error('phone_number')
-                                    <span class="error invalid-feedback">
-                                        {{ $message }}
-                                    </span>
-                                @enderror
-                            </div>
-
-                            <div class="input-group mb-3">
-                                <input type="password" name="password" id="password"
-                                    class="form-control @error('password') is-invalid @enderror"
-                                    placeholder="{{ __('Password') }}" required autocomplete="new-password">
-                                <div class="input-group-append">
-                                    <div class="input-group-text">
-                                        <span class="fas fa-lock"></span>
-                                    </div>
-                                </div>
-                                @error('password')
-                                    <span class="error invalid-feedback">
-                                        {{ $message }}
-                                    </span>
-                                @enderror
-                            </div>
-
-                            <div class="input-group mb-3">
-                                <input type="password" name="password_confirmation" id="password_confirmation"
-                                    class="form-control @error('password_confirmation') is-invalid @enderror"
-                                    placeholder="{{ __('Confirm Password') }}" required autocomplete="new-password">
-                                <div class="input-group-append">
-                                    <div class="input-group-text">
-                                        <span class="fas fa-lock"></span>
-                                    </div>
-                                </div>
-                                <label class="form-label fw-500 d-none" id="error-message-register"
-                                    style="color: #EE3C3B;"></label>
-                            </div>
-
-                            <div class="row">
-                                <div class="col-12">
-                                    <button type="submit" id="register"
-                                        class="btn btn-primary btn-block">{{ __('Register') }}</button>
-                                </div>
-                            </div>
-
-                            <div class="col-12">
-                                <!-- Google login button -->
-                                <div class="text-center mt-3">
-                                    <a href="{{ route('google-verify') }}" class="btn btn-danger btn-block">
-                                        <i class="fab fa-google mr-2"></i>Continue with Google
-                                    </a>
-                                </div>
-                                <!-- /.social-auth-links -->
-                            </div>
-
-                            <hr>
-                            <p class="mb-0">
-                                Already have an account? <a href="{{ route('login') }}">{{ __('Sign in') }}</a>
-                            </p>
                         </div>
+                        <div class="input-group mb-3">
+                            <input type="text" name="phone_number" id="phone_number"
+                                class="form-control @error('phone_number') is-invalid @enderror"
+                                placeholder="{{ __('Phone Number') }}" required autocomplete="phone_number">
+                            <div class="input-group-append">
+                                <div class="input-group-text">
+                                    <span class="fas fa-phone"></span>
+                                </div>
+                            </div>
+                            @error('phone_number')
+                                <span class="error invalid-feedback">
+                                    {{ $message }}
+                                </span>
+                            @enderror
+                        </div>
+
+                        <div class="input-group mb-3">
+                            <input type="password" name="password" id="password"
+                                class="form-control @error('password') is-invalid @enderror"
+                                placeholder="{{ __('Password') }}" required autocomplete="new-password">
+                            <div class="input-group-append">
+                                <div class="input-group-text">
+                                    <span class="fas fa-lock"></span>
+                                </div>
+                            </div>
+                            @error('password')
+                                <span class="error invalid-feedback">
+                                    {{ $message }}
+                                </span>
+                            @enderror
+                        </div>
+
+                        <div class="input-group mb-3">
+                            <input type="password" name="password_confirmation" id="password_confirmation"
+                                class="form-control @error('password_confirmation') is-invalid @enderror"
+                                placeholder="{{ __('Confirm Password') }}" required autocomplete="new-password">
+                            <div class="input-group-append">
+                                <div class="input-group-text">
+                                    <span class="fas fa-lock"></span>
+                                </div>
+                            </div>
+                            <label class="form-label fw-500 d-none" id="error-message-register"
+                                style="color: #EE3C3B;"></label>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-12">
+                                <button type="submit" id="register"
+                                    class="btn btn-primary btn-block">{{ __('Register') }}</button>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <!-- Google login button -->
+                            <div class="text-center mt-3">
+                                <a href="{{ route('google-auth') }}" class="btn btn-danger btn-block">
+                                    <i class="fab fa-google mr-2"></i>Continue with Google
+                                </a>
+                            </div>
+                            <!-- /.social-auth-links -->
+                        </div>
+
+                        <hr>
+                        <p class="mb-0">
+                            Already have an account? <a href="{{ route('login') }}">{{ __('Sign in') }}</a>
+                        </p>
+
                     </div>
                 </div>
             </div>
