@@ -10,14 +10,12 @@
 namespace PHPUnit\TextUI\CliArguments;
 
 use function array_map;
-use function array_merge;
 use function basename;
 use function explode;
 use function getcwd;
 use function is_file;
 use function is_numeric;
 use function sprintf;
-use function str_contains;
 use PHPUnit\Event\Facade as EventFacade;
 use PHPUnit\Runner\TestSuiteSorter;
 use PHPUnit\Util\Filesystem;
@@ -35,10 +33,12 @@ final class Builder
         'cache-result',
         'do-not-cache-result',
         'cache-directory=',
+        'cache-result-file=',
         'check-version',
         'colors==',
         'columns=',
         'configuration=',
+        'coverage-cache=',
         'warm-coverage-cache',
         'coverage-filter=',
         'coverage-clover=',
@@ -62,7 +62,6 @@ final class Builder
         'enforce-time-limit',
         'exclude-group=',
         'filter=',
-        'exclude-filter=',
         'generate-baseline=',
         'use-baseline=',
         'ignore-baseline',
@@ -77,7 +76,6 @@ final class Builder
         'include-path=',
         'list-groups',
         'list-suites',
-        'list-test-files',
         'list-tests',
         'list-tests-xml=',
         'log-junit=',
@@ -163,10 +161,12 @@ final class Builder
         $bootstrap                         = null;
         $cacheDirectory                    = null;
         $cacheResult                       = null;
+        $cacheResultFile                   = null;
         $checkVersion                      = false;
         $colors                            = null;
         $columns                           = null;
         $configuration                     = null;
+        $coverageCacheDirectory            = null;
         $warmCoverageCache                 = false;
         $coverageFilter                    = null;
         $coverageClover                    = null;
@@ -209,7 +209,6 @@ final class Builder
         $stopOnSkipped                     = null;
         $stopOnWarning                     = null;
         $filter                            = null;
-        $excludeFilter                     = null;
         $generateBaseline                  = null;
         $useBaseline                       = null;
         $ignoreBaseline                    = false;
@@ -224,7 +223,6 @@ final class Builder
         $junitLogfile                      = null;
         $listGroups                        = false;
         $listSuites                        = false;
-        $listTestFiles                     = false;
         $listTests                         = false;
         $listTestsXml                      = null;
         $noCoverage                        = null;
@@ -283,6 +281,11 @@ final class Builder
 
                     break;
 
+                case '--cache-result-file':
+                    $cacheResultFile = $option[1];
+
+                    break;
+
                 case '--columns':
                     if (is_numeric($option[1])) {
                         $columns = (int) $option[1];
@@ -295,6 +298,11 @@ final class Builder
                 case 'c':
                 case '--configuration':
                     $configuration = $option[1];
+
+                    break;
+
+                case '--coverage-cache':
+                    $coverageCacheDirectory = $option[1];
 
                     break;
 
@@ -383,11 +391,6 @@ final class Builder
 
                     break;
 
-                case '--exclude-filter':
-                    $excludeFilter = $option[1];
-
-                    break;
-
                 case '--testsuite':
                     $testSuite = $option[1];
 
@@ -432,87 +435,27 @@ final class Builder
                     break;
 
                 case '--group':
-                    if (str_contains($option[1], ',')) {
-                        EventFacade::emitter()->testRunnerTriggeredWarning(
-                            'Using comma-separated values with --group is deprecated and will no longer work in PHPUnit 12. You can use --group multiple times instead.',
-                        );
-                    }
-
-                    if ($groups === null) {
-                        $groups = [];
-                    }
-
-                    $groups = array_merge($groups, explode(',', $option[1]));
-
-                    $optionAllowedMultipleTimes = true;
+                    $groups = explode(',', $option[1]);
 
                     break;
 
                 case '--exclude-group':
-                    if (str_contains($option[1], ',')) {
-                        EventFacade::emitter()->testRunnerTriggeredWarning(
-                            'Using comma-separated values with --exclude-group is deprecated and will no longer work in PHPUnit 12. You can use --exclude-group multiple times instead.',
-                        );
-                    }
-
-                    if ($excludeGroups === null) {
-                        $excludeGroups = [];
-                    }
-
-                    $excludeGroups = array_merge($excludeGroups, explode(',', $option[1]));
-
-                    $optionAllowedMultipleTimes = true;
+                    $excludeGroups = explode(',', $option[1]);
 
                     break;
 
                 case '--covers':
-                    if (str_contains($option[1], ',')) {
-                        EventFacade::emitter()->testRunnerTriggeredWarning(
-                            'Using comma-separated values with --covers is deprecated and will no longer work in PHPUnit 12. You can use --covers multiple times instead.',
-                        );
-                    }
-
-                    if ($testsCovering === null) {
-                        $testsCovering = [];
-                    }
-
-                    $testsCovering = array_merge($testsCovering, array_map('strtolower', explode(',', $option[1])));
-
-                    $optionAllowedMultipleTimes = true;
+                    $testsCovering = array_map('strtolower', explode(',', $option[1]));
 
                     break;
 
                 case '--uses':
-                    if (str_contains($option[1], ',')) {
-                        EventFacade::emitter()->testRunnerTriggeredWarning(
-                            'Using comma-separated values with --uses is deprecated and will no longer work in PHPUnit 12. You can use --uses multiple times instead.',
-                        );
-                    }
-
-                    if ($testsUsing === null) {
-                        $testsUsing = [];
-                    }
-
-                    $testsUsing = array_merge($testsUsing, array_map('strtolower', explode(',', $option[1])));
-
-                    $optionAllowedMultipleTimes = true;
+                    $testsUsing = array_map('strtolower', explode(',', $option[1]));
 
                     break;
 
                 case '--test-suffix':
-                    if (str_contains($option[1], ',')) {
-                        EventFacade::emitter()->testRunnerTriggeredWarning(
-                            'Using comma-separated values with --test-suffix is deprecated and will no longer work in PHPUnit 12. You can use --test-suffix multiple times instead.',
-                        );
-                    }
-
-                    if ($testSuffixes === null) {
-                        $testSuffixes = [];
-                    }
-
-                    $testSuffixes = array_merge($testSuffixes, explode(',', $option[1]));
-
-                    $optionAllowedMultipleTimes = true;
+                    $testSuffixes = explode(',', $option[1]);
 
                     break;
 
@@ -528,11 +471,6 @@ final class Builder
 
                 case '--list-suites':
                     $listSuites = true;
-
-                    break;
-
-                case '--list-test-files':
-                    $listTestFiles = true;
 
                     break;
 
@@ -945,6 +883,7 @@ final class Builder
             $bootstrap,
             $cacheDirectory,
             $cacheResult,
+            $cacheResultFile,
             $checkVersion,
             $colors,
             $columns,
@@ -959,6 +898,7 @@ final class Builder
             $coverageTextShowOnlySummary,
             $coverageXml,
             $pathCoverage,
+            $coverageCacheDirectory,
             $warmCoverageCache,
             $defaultTimeLimit,
             $disableCodeCoverageIgnore,
@@ -984,7 +924,6 @@ final class Builder
             $stopOnSkipped,
             $stopOnWarning,
             $filter,
-            $excludeFilter,
             $generateBaseline,
             $useBaseline,
             $ignoreBaseline,
@@ -999,7 +938,6 @@ final class Builder
             $junitLogfile,
             $listGroups,
             $listSuites,
-            $listTestFiles,
             $listTests,
             $listTestsXml,
             $noCoverage,

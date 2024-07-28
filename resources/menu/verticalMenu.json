@@ -1,0 +1,86 @@
+{
+  "menu": [
+    {
+      "url": "/",
+      "icon": "menu-icon tf-icons mdi mdi-home-outline",
+      "name": "Dashboards",
+      "slug": "dashboard-analytics"
+    },
+    {
+      "url": "/maps",
+      "icon": "menu-icon tf-icons mdi mdi-map-outline",
+      "name": "Maps",
+      "slug": "dashboard-maps"
+    },
+    {
+      "menuHeader": "Admin"
+    },
+    {
+      "url": "merchants",
+      "icon": "menu-icon tf-icons mdi mdi-database-outline",
+      "name": "Merchants",
+      "slug": "merchants"
+    },
+    {
+      "url": "merchants_locations",
+      "icon": "menu-icon tf-icons mdi mdi-database-outline",
+      "name": "Merchants Locations",
+      "slug": "merchants_locations"
+    },
+    {
+      "url": "parking_lots",
+      "icon": "menu-icon tf-icons mdi mdi-database-outline",
+      "name": "Parking Lots",
+      "slug": "parking_lots"
+    },
+    {
+      "url": "users",
+      "icon": "menu-icon tf-icons mdi mdi-database-outline",
+      "name": "Users",
+      "slug": "users"
+    },
+    {
+      "menuHeader": "Account"
+    },
+    {
+      "url": "pages/account-settings-account",
+      "icon": "menu-icon tf-icons mdi mdi-account-outline",
+      "name": "Account",
+      "slug": "pages-account-settings-account"
+    },
+    {
+      "name": "Authentications",
+      "icon": "menu-icon tf-icons mdi mdi-lock-open-outline",
+      "slug": "auth",
+      "submenu": [
+        {
+          "url": "auth/login-basic",
+          "name": "Login",
+          "slug": "auth-login-basic",
+          "target": "_blank"
+        },
+        {
+          "url": "auth/register-basic",
+          "name": "Register",
+          "slug": "auth-register-basic",
+          "target": "_blank"
+        },
+        {
+          "url": "auth/forgot-password-basic",
+          "name": "Forgot Password",
+          "slug": "auth-forgot-password-basic",
+          "target": "_blank"
+        }
+      ]
+    },
+    {
+      "menuHeader": "About"
+    },
+    {
+      "url": "/about-us",
+      "icon": "menu-icon tf-icons mdi mdi-us-outline",
+      "name": "About Us",
+      "slug": "about-us"
+    }
+  ]
+}

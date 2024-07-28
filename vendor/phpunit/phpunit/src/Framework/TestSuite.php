@@ -11,7 +11,7 @@ namespace PHPUnit\Framework;
 
 use const PHP_EOL;
 use function array_keys;
-use function array_merge;
+use function array_map;
 use function array_pop;
 use function array_reverse;
 use function assert;
@@ -63,7 +63,7 @@ class TestSuite implements IteratorAggregate, Reorderable, SelfDescribing, Test
     private string $name;
 
     /**
-     * @psalm-var array<non-empty-string, list<non-empty-string>>
+     * @psalm-var array<string,list<Test>>
      */
     private array $groups = [];
 
@@ -93,10 +93,18 @@ class TestSuite implements IteratorAggregate, Reorderable, SelfDescribing, Test
     }
 
     /**
-     * @psalm-param ReflectionClass<TestCase> $class
-     * @psalm-param list<non-empty-string> $groups
+     * @psalm-param class-string $className
      */
-    public static function fromClassReflector(ReflectionClass $class, array $groups = []): static
+    public static function fromClassName(string $className): static
+    {
+        assert(class_exists($className));
+
+        $class = new ReflectionClass($className);
+
+        return static::fromClassReflector($class);
+    }
+
+    public static function fromClassReflector(ReflectionClass $class): static
     {
         $testSuite = new static($class->getName());
 
@@ -126,7 +134,7 @@ class TestSuite implements IteratorAggregate, Reorderable, SelfDescribing, Test
                 continue;
             }
 
-            $testSuite->addTestMethod($class, $method, $groups);
+            $testSuite->addTestMethod($class, $method);
         }
 
         if ($testSuite->isEmpty()) {
@@ -162,41 +170,30 @@ class TestSuite implements IteratorAggregate, Reorderable, SelfDescribing, Test
      */
     public function addTest(Test $test, array $groups = []): void
     {
-        if ($test instanceof self) {
-            $this->tests[] = $test;
-
-            $this->clearCaches();
-
-            return;
-        }
-
-        assert($test instanceof TestCase || $test instanceof PhptTestCase);
-
         $class = new ReflectionClass($test);
 
         if (!$class->isAbstract()) {
             $this->tests[] = $test;
-
             $this->clearCaches();
+
+            if ($test instanceof self && empty($groups)) {
+                $groups = $test->groups();
+            }
 
             if ($this->containsOnlyVirtualGroups($groups)) {
                 $groups[] = 'default';
             }
 
-            if ($test instanceof TestCase) {
-                $id = $test->valueObjectForEvents()->id();
-
-                $test->setGroups($groups);
-            } else {
-                $id = $test->valueObjectForEvents()->id();
-            }
-
             foreach ($groups as $group) {
                 if (!isset($this->groups[$group])) {
-                    $this->groups[$group] = [$id];
+                    $this->groups[$group] = [$test];
                 } else {
-                    $this->groups[$group][] = $id;
+                    $this->groups[$group][] = $test;
                 }
+            }
+
+            if ($test instanceof TestCase) {
+                $test->setGroups($groups);
             }
         }
     }
@@ -204,11 +201,9 @@ class TestSuite implements IteratorAggregate, Reorderable, SelfDescribing, Test
     /**
      * Adds the tests from the given class to the suite.
      *
-     * @psalm-param list<non-empty-string> $groups
-     *
      * @throws Exception
      */
-    public function addTestSuite(ReflectionClass $testClass, array $groups = []): void
+    public function addTestSuite(ReflectionClass $testClass): void
     {
         if ($testClass->isAbstract()) {
             throw new Exception(
@@ -229,7 +224,7 @@ class TestSuite implements IteratorAggregate, Reorderable, SelfDescribing, Test
             );
         }
 
-        $this->addTest(self::fromClassReflector($testClass, $groups), $groups);
+        $this->addTest(self::fromClassReflector($testClass));
     }
 
     /**
@@ -240,11 +235,9 @@ class TestSuite implements IteratorAggregate, Reorderable, SelfDescribing, Test
      * added, a <code>PHPUnit\Framework\WarningTestCase</code> will be created instead,
      * leaving the current test run untouched.
      *
-     * @psalm-param list<non-empty-string> $groups
-     *
      * @throws Exception
      */
-    public function addTestFile(string $filename, array $groups = []): void
+    public function addTestFile(string $filename): void
     {
         if (str_ends_with($filename, '.phpt') && is_file($filename)) {
             try {
@@ -261,7 +254,6 @@ class TestSuite implements IteratorAggregate, Reorderable, SelfDescribing, Test
         try {
             $this->addTestSuite(
                 (new TestSuiteLoader)->load($filename),
-                $groups,
             );
         } catch (RunnerException $e) {
             Event\Facade::emitter()->testRunnerTriggeredWarning(
@@ -318,41 +310,19 @@ class TestSuite implements IteratorAggregate, Reorderable, SelfDescribing, Test
     /**
      * Returns the test groups of the suite.
      *
-     * @psalm-return list<non-empty-string>
+     * @psalm-return list<string>
      */
     public function groups(): array
     {
-        return array_keys($this->groups);
+        return array_map(
+            'strval',
+            array_keys($this->groups),
+        );
     }
 
-    /**
-     * @psalm-return array<non-empty-string, list<non-empty-string>>
-     */
     public function groupDetails(): array
     {
         return $this->groups;
-    }
-
-    /**
-     * @psalm-return list<TestCase|PhptTestCase>
-     */
-    public function collect(): array
-    {
-        $tests = [];
-
-        foreach ($this as $test) {
-            if ($test instanceof self) {
-                $tests = array_merge($tests, $test->collect());
-
-                continue;
-            }
-
-            assert($test instanceof TestCase || $test instanceof PhptTestCase);
-
-            $tests[] = $test;
-        }
-
-        return $tests;
     }
 
     /**
@@ -523,7 +493,7 @@ class TestSuite implements IteratorAggregate, Reorderable, SelfDescribing, Test
     }
 
     /**
-     * @psalm-assert-if-true class-string<TestCase> $this->name
+     * @psalm-assert-if-true class-string $this->name
      */
     public function isForTestClass(): bool
     {
@@ -531,12 +501,10 @@ class TestSuite implements IteratorAggregate, Reorderable, SelfDescribing, Test
     }
 
     /**
-     * @psalm-param ReflectionClass<TestCase> $class
-     * @psalm-param list<non-empty-string> $groups
-     *
+     * @throws Event\TestData\MoreThanOneDataSetFromDataProviderException
      * @throws Exception
      */
-    protected function addTestMethod(ReflectionClass $class, ReflectionMethod $method, array $groups): void
+    protected function addTestMethod(ReflectionClass $class, ReflectionMethod $method): void
     {
         $className  = $class->getName();
         $methodName = $method->getName();
@@ -544,7 +512,7 @@ class TestSuite implements IteratorAggregate, Reorderable, SelfDescribing, Test
         assert(!empty($methodName));
 
         try {
-            $test = (new TestBuilder)->build($class, $methodName, $groups);
+            $test = (new TestBuilder)->build($class, $methodName);
         } catch (InvalidDataProviderException $e) {
             Event\Facade::emitter()->testTriggeredPhpunitError(
                 new TestMethod(
@@ -578,10 +546,7 @@ class TestSuite implements IteratorAggregate, Reorderable, SelfDescribing, Test
 
         $this->addTest(
             $test,
-            array_merge(
-                $groups,
-                (new Groups)->groups($class->getName(), $methodName),
-            ),
+            (new Groups)->groups($class->getName(), $methodName),
         );
     }
 
